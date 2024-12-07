@@ -2,35 +2,57 @@ package org.example;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         try{
-            System.out.print("Hello and welcome!");
-
-            List<String> fileLinesAsList = Files.readAllLines(Paths.get("C:\\Users\\r2dan\\IdeaProjects\\aoc2024\\src\\main\\java\\org\\example\\day1_input.txt"));
-            List<Integer> leftNumbers = new ArrayList<Integer>();
-            List<Integer> rightNumbers = new ArrayList<Integer>();
-
+            Integer countOfPassingReports = 0;
+            List<String> fileLinesAsList = Files.readAllLines(Paths.get("C:\\Users\\r2dan\\IdeaProjects\\aoc2024\\src\\main\\java\\org\\example\\day2_input.txt"));
+            List<List<Integer>> inputAs2DList = new ArrayList<List<Integer>>();
+            List<List<Integer>> inputAs2DListOfDifferences = new ArrayList<>();
+            //Get 2D list of input as integers
             for(int i = 0; i < fileLinesAsList.size(); i ++){
+                List<Integer> lineInts = new ArrayList<>();
                 String line = fileLinesAsList.get(i);
-
-                leftNumbers.add(Integer.parseInt(fileLinesAsList.get(i).substring(0, 5)));
-                rightNumbers.add(Integer.parseInt(fileLinesAsList.get(i).substring(8, 13)));
-
-                Collections.sort(leftNumbers);
-                Collections.sort(rightNumbers);
+                String[] lineAsStringList = line.split(" ");
+                for(int j = 0; j < lineAsStringList.length; j++) {
+                    lineInts.add(Integer.parseInt(lineAsStringList[j]));
+                }
+                inputAs2DList.add(lineInts);
             }
 
-            Integer sumOfDiffs = 0;
-            for(int i = 0; i < fileLinesAsList.size(); i ++){
-                sumOfDiffs += Math.abs(leftNumbers.get(i) - rightNumbers.get(i));
+            //Convert list of integers to list of differences.  Should be easier to work with?
+            for(int i = 0; i < inputAs2DList.size(); i++) {
+                List<Integer> lineDifferences = new ArrayList<>();
+                for(int j = 0; j < inputAs2DList.get(i).size() - 1; j++){
+                    lineDifferences.add(inputAs2DList.get(i).get(j) - inputAs2DList.get(i).get(j + 1));
+                }
+                inputAs2DListOfDifferences.add(lineDifferences);
             }
-            System.out.print(sumOfDiffs);
+
+            //Check each list of differences against rules
+            for(int i = 0; i < inputAs2DListOfDifferences.size(); i++){
+                Integer naturalSum = 0;
+                Integer absoluteSum = 0;
+                Boolean succeed = true;
+                for(int j = 0; j < inputAs2DListOfDifferences.get(i).size(); j++){
+                    Integer difference = inputAs2DListOfDifferences.get(i).get(j);
+                    if(difference < -3 || difference > 3 || difference == 0) {
+                        succeed = false;
+                        break;
+                    }
+                    naturalSum += difference;
+                    absoluteSum += Math.abs(difference);
+                }
+
+                if(Math.abs(naturalSum) == absoluteSum && succeed) {
+                    countOfPassingReports++;
+                }
+            }
+
+            System.out.print(countOfPassingReports);
         }
         catch (Exception e){
             System.out.print(e);
